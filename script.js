@@ -5,6 +5,7 @@ class photoGallery{
         this.galleryDiv = document.querySelector('.gallery');
         this.searchForm = document.querySelector('.header form');
         this.loadMore = document.querySelector('.load-more');
+        this.logo = document.querySelector('.logo');
         this.pageIndex = 1;
         this.EventHandle();
     }
@@ -15,10 +16,18 @@ class photoGallery{
         });
         this.searchForm.addEventListener('submit',(e)=>{
             e.preventDefault();
+            this.pageIndex = 1;
             this.GetSearchImages(e);
         });
-        this.loadMore.addEventListener('click', ()=>{
-            this.loadMoreImages();
+        this.loadMore.addEventListener('click', (e)=>{
+            e.preventDefault();
+            this.loadMoreImages(e);
+        });
+        this.logo.addEventListener('click', (e)=>{
+            e.preventDefault();
+            this.pageIndex = 1;
+            this.galleryDiv.innerHTML=``;
+            this.GetImage(this.pageIndex);
         })
     }
 
@@ -38,8 +47,28 @@ class photoGallery{
         this.galleryDiv.innerHTML=``;
         this.GenerateHtml(data.photos);
     }
-    async loadMoreImages(){
-        this.index = ++this.pageIndex;
+    async getLoadMoreSearchImages(index){
+        console.log(index);
+        const searchValue = this.searchForm.querySelector('input').value;
+        console.log(searchValue);
+        const baseUrl = await `https://api.pexels.com/v1/search?query=${searchValue}&page=${index}&&per_page=12`;
+        console.log(baseUrl);
+        const data = await this.FetchImages(baseUrl);
+        this.GenerateHtml(data.photos);
+    }
+
+    async loadMoreImages(e){
+        let index = ++this.pageIndex;
+        const loadMoreData = e.target.getAttribute('data-img');
+        console.log(index);
+        if(loadMoreData == 'cureted'){
+            //for cuteted
+            await this.GetImage(index);
+        }else{
+            //for search
+            console.log(index);
+            await this.getLoadMoreSearchImages(index);
+        }
     }
 
     async FetchImages(url){
@@ -59,7 +88,7 @@ class photoGallery{
             const divElement = document.createElement('div');
             divElement.classList.add('item');
             divElement.innerHTML=`
-            <a href="#">
+            <a href="${photo.src.original}" target="_blank">
                 <img src="${photo.src.medium}"alt="img">
                 <h3>${photo.photographer}</h3>
             </a>            
