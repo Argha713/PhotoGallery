@@ -11,7 +11,7 @@ class photoGallery{
 
     EventHandle(){
         document.addEventListener('DOMContentLoaded',()=>{
-            this.GetImage(index);
+            this.GetImage(this.pageIndex);
         });
         this.searchForm.addEventListener('submit',(e)=>{
             e.preventDefault();
